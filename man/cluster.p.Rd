@@ -21,6 +21,6 @@ cluster.p(nii.p, vol.p=1, nii.sign=NULL, vol.sign=vol.p, nii.mask=NULL, vol.mask
 }
 \value{}
 \author{
-Timothy R. Koscik <timkoscik+mripkg@gmail.com>
+Timothy R. Koscik <timkoscik+cluster@gmail.com>
 }
 \examples{}

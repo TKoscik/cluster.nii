@@ -4,7 +4,7 @@ Title: Clustering tools for NIFTI files
 Version: 1.0
 Date: 2018-06-22
 Author: Timothy R. Koscik
-Maintainer: Timothy R. Koscik <kosciklab+cluster.nii@gmail.com>
+Maintainer: Timothy R. Koscik <kosciklab+cluster@gmail.com>
 Description: More about what it does (maybe more than one line)
 License: MIT
 Remotes: TKoscik/nifti.io

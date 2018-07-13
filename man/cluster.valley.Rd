@@ -1,5 +1,5 @@
-\name{cluster.lmax}
-\alias{cluster.lmax}
+\name{cluster.valley}
+\alias{cluster.valley}
 \title{
 Cluster based on effect sign, p value, and proximity to local minima/maxima
 }
@@ -21,6 +21,6 @@ cluster.valley(tmap, tvol, pmap, pvol, mask, mvol, alpha = 0.05, min.size = 10, 
 }
 \value{}
 \author{
-Timothy R. Koscik <timkoscik+mripkg@gmail.com>
+Timothy R. Koscik <timkoscik+cluster@gmail.com>
 }
 \examples{}
