@@ -1,4 +1,4 @@
-Package: cluster.nii
+Package: nifti.cluster
 Type: Package
 Title: Clustering tools for NIFTI files
 Version: 1.0
