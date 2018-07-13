@@ -5,10 +5,6 @@ cluster.p <- function(nii.p, vol.p=1,
                       cluster.size, 
                       connectivity=26,
                       save.dir, file.name = NULL) {
-  #-------------------------------------------------------------------------------------
-  # Copyright (C) 2017 Koscik, Timothy R. All Rights Reserved
-  #-------------------------------------------------------------------------------------
-  
   pmap <- read.nii.volume(nii.p, vol.p)
   
   if (!is.null(nii.mask)) {

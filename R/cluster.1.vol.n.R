@@ -1,8 +1,4 @@
 cluster.1.vol.n <- function(nii.file, save.dir=NULL, file.name=NULL) {
-  #-------------------------------------------------------------------------------------
-  # Copyright (C) 2017 Koscik, Timothy R. All Rights Reserved
-  #-------------------------------------------------------------------------------------
-
   if (missing(save.dir)) { save.dir <- getwd() }
   if (missing(file.name)) {
     ftemp <- unlist(strsplit(nii.file, split="[/]"))
