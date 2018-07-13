@@ -7,4 +7,4 @@ Author: Timothy R. Koscik
 Maintainer: Timothy R. Koscik <kosciklab+cluster@gmail.com>
 Description: More about what it does (maybe more than one line)
 License: MIT
-Remotes: url::https://github.com/TKoscik/nifti.io
+Remotes: github::TKoscik/nifti.io
