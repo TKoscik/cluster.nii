@@ -12,6 +12,6 @@
 }
 \value{}
 \author{
-  Timothy R. Koscik <timkoscik+mripkg@gmail.com>
+  Timothy R. Koscik <timkoscik+cluster@gmail.com>
 }
 \examples{}
