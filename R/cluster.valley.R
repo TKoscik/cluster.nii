@@ -77,10 +77,11 @@ cluster.valley <- function(tmap,
       }
     }
     init.cl.ls <- as.data.frame(table(connected))
+    init.cl.ls$connected <- as.numeric(levels(init.cl.ls$connected))
     init.cl.ls <- init.cl.ls[-1, ]
     init.cl.ls <- init.cl.ls[order(init.cl.ls$Freq, decreasing = TRUE), ]
     # Remove small islands
-    remove.ls <- as.numeric(init.cl.ls$connected[init.cl.ls$Freq < min.size])
+    remove.ls <- as.numeric(init.cl.ls$connected[which(init.cl.ls$Freq < min.size)])
     connected[connected %in% remove.ls] <- 0
 
     # reset map
@@ -275,9 +276,11 @@ cluster.valley <- function(tmap,
       }
     }
     init.cl.ls <- as.data.frame(table(connected))
+    init.cl.ls$connected <- as.numeric(levels(init.cl.ls$connected))
     init.cl.ls <- init.cl.ls[-1, ]
+    init.cl.ls <- init.cl.ls[order(init.cl.ls$Freq, decreasing = TRUE), ]
     # Remove small islands
-    remove.ls <- which(init.cl.ls$Freq < min.size)
+    remove.ls <- as.numeric(init.cl.ls$connected[which(init.cl.ls$Freq < min.size)])
     connected[connected %in% remove.ls] <- 0
 
     # reset map
