@@ -6,20 +6,7 @@ atlas.rois <- function(cluster.nii,
                        save.table = FALSE,
                        save.dir = NULL,
                        prefix = NULL) {
-  
-  #debug 
-  rm(list=ls())
-  gc()
-  cluster.nii  <- "/rdss/koscikt/projects/duplex_gamble/analyses/20171220_decision/decision_mediators.vol1.cl26.th.gt0.sz15.nii"
-  cluster.vol="all"
-  atlas.nii <- "/rdss/koscikt/brains/cluster_splitter_2mm.nii"
-  atlas.csv <- "/rdss/koscikt/brains/cluster_splitter_key.csv"
-  return.table = TRUE
-  save.table = TRUE
-  save.dir <- "/rdss/koscikt/projects/duplex_gamble/analyses/20171220_decision"
-  prefix <- "test.table"
-  #
-  
+   
   n.cluster <- nii.dims(cluster.nii)[4]
   if (cluster.vol=="all") { cluster.vol <- 1:n.cluster }
 
