@@ -5,18 +5,18 @@ cluster.valley <- function(data.3d, vol.3d,
                            dir = c("native", "invert", "abs"),
                            save.dir,
                            file.prefix) {
-  # debug ----
-  rm(list=ls())
-  library(nifti.io)
-  data.3d <- "D:/data/duplex.20180219/m02/duplex.mask1.m02.coef.tvalue.nii"
-  vol.3d <- 2
-  mask <- "D:/data/duplex.20180219/m02/temp_mask.nii"
-  vol.mask <- 1
-  min.size = 10
-  dir = c("native", "invert", "abs")
-  source('D:/programs/nifti.cluster/R/cluster.3d.R')
-  source('D:/programs/nifti.cluster/R/get.neighbor.R')
-  #----
+  # # debug ----
+  # rm(list=ls())
+  # library(nifti.io)
+  # data.3d <- "D:/data/duplex.20180219/m02/duplex.mask1.m02.coef.tvalue.nii"
+  # vol.3d <- 2
+  # mask <- "D:/data/duplex.20180219/m02/temp_mask.nii"
+  # vol.mask <- 1
+  # min.size = 10
+  # dir = c("native", "invert", "abs")
+  # source('D:/programs/nifti.cluster/R/cluster.3d.R')
+  # source('D:/programs/nifti.cluster/R/get.neighbor.R')
+  # #----
 
   pixdim <- unlist(nii.hdr(data.3d, "pixdim"))
   orient <- nii.orient(data.3d)
@@ -160,21 +160,8 @@ cluster.valley <- function(data.3d, vol.3d,
     hills.ordered[hills == hill.table$hills[i]] <- i
   }
   
-  
-    # debug
-    init.nii("D:/data/duplex.20180219/m02/valleys.nii", dim(mask), pixdim, orient)
-    init.nii("D:/data/duplex.20180219/m02/hills.nii", dim(mask), pixdim, orient)
-    write.nii.volume("D:/data/duplex.20180219/m02/valleys.nii", 1, valleys)
-    write.nii.volume("D:/data/duplex.20180219/m02/hills.nii", 1, hills.ordered)
-    
-    #
-    
-    
-    # save output
-    fname <- paste0(save.dir, "/", file.prefix, ".pos.cluster.nii")
-    init.nii(fname, img.dims, pixdim, orient)
-    write.nii.volume(fname, 1, out)
-  }
-
-  
+# save output ------------------------------------------------------------------
+    fname <- paste0(save.dir, "/", file.prefix, ".nii")
+    init.nii(fname, dim(mask), pixdim, orient)
+    write.nii.volume(fname, 1, hills.ordered)
 }
