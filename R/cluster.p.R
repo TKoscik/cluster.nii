@@ -110,7 +110,8 @@ cluster.p <- function(nii.p, vol.p=1,
       if (!dir.exists(save.dir)) { dir.create(save.dir) }
       
       init.nii(file.name=fname, dims=c(img.dims[1:3], n.clusters),
-               pixdim=NULL, orient=NULL)
+               pixdim=unlist(nii.hdr(nii.p, "pixdim")),
+               orient=nii.orient(nii.p))
       
       for (k in 1:n.clusters) {
         write.nii.volume(
