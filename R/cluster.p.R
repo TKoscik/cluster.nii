@@ -5,6 +5,8 @@ cluster.p <- function(nii.p, vol.p=1,
                       cluster.size, 
                       connectivity=26,
                       save.dir, file.name = NULL, save.nii=TRUE) {
+  
+  img.dims <- nii.dims(nii.p)
   pmap <- read.nii.volume(nii.p, vol.p)
   
   if (!is.null(nii.mask)) {
@@ -17,13 +19,18 @@ cluster.p <- function(nii.p, vol.p=1,
   if (!is.null(nii.sign)) {
     sign.temp <- sign(read.nii.volume(nii.sign, vol.sign))
     sign.map <- list()
-    sign.map[[1]] <- (sign.temp==1)*1
-    sign.map[[2]] <- (sign.temp==-1)*1
+    sign.map$pos <- (sign.temp==1)*1
+    sign.map$neg <- (sign.temp==-1)*1
     n.dir <- 2
+    cluster.array <- list()
+    cluster.array$pos <- array(0, dim=img.dims[1:3])
+    cluster.array$neg <- array(0, dim=img.dims[1:3])
   } else {
     n.dir = 1
     sign.map <- list()
-    sign.map[[1]] <- (pmap>0)*1
+    sign.map$abs <- (pmap>0)*1
+    cluster.array <- list()
+    cluster.array$pOnly <- array(0, dim=img.dims[1:3])
   }
   
   # Threshold
@@ -31,8 +38,6 @@ cluster.p <- function(nii.p, vol.p=1,
   for (i in 1:n.dir) {
     pmap.dir[[i]] <- (pmap < p.thresh & !is.na(pmap) & sign.map[[i]]==1) * 1
   }
-  
-  img.dims <- nii.dims(nii.p)
   
   # Initialize connectivity neighbourhood ----
   if (is.null(connectivity)) { connectivity <- 26 }
@@ -53,9 +58,7 @@ cluster.p <- function(nii.p, vol.p=1,
     as.integer(colSums(t(center.pt[ ,1:3, drop=FALSE]-1)*cdim) + 1L)
   
   for (j in 1:n.dir) {
-    # Initialize cluster volume ----
-    connected <- array(0, dim=img.dims[1:3])
-    
+    connected <- array(0, dim=img.dims[1:3]) # Initialize cluster volume
     num.clusters <- 0
     idx <- numeric()
     for (x in 1:img.dims[1]) {
@@ -84,11 +87,9 @@ cluster.p <- function(nii.p, vol.p=1,
     connected.size <- connected.size[which(connected.size$Freq >= cluster.size), ]
     n.clusters <- nrow(connected.size)
     if (n.clusters != 0) {
-      cluster.array <- array(0, dim=c(img.dims[1:3], n.clusters))
       for (k in 1:n.clusters) {
-        cluster.array[connected == connected.size$connected[k]] <- k
+        cluster.array[[j]][connected == connected.size$connected[k]] <- k
       }
-      
       if (save.nii) {
         fname <- unlist(strsplit(nii.p, "[/]"))
         fname <- fname[(length(fname))]
@@ -96,21 +97,13 @@ cluster.p <- function(nii.p, vol.p=1,
         fname <- paste(fname[-length(fname)], collapse=".")
         if (is.null(file.name)) {
           fname <- paste0(save.dir, "/", fname,
-                          ".vol", vol.p,
-                          ".cl", connectivity,
-                          ".p", p.thresh,
-                          ".sz", cluster.size)
+            ".vol", vol.p, ".cl", connectivity, ".p", p.thresh, ".sz", cluster.size)
         } else {
           fname <- paste0(save.dir, "/", file.name)
         }
-        if (j == 1) {
-          fname <- paste0(fname, ".pos.nii")
-        } else {
-          fname <- paste0(fname, ".neg.nii")
-        }
+        fname <- paste0(fname, ".", names(cluster.array)[j], ".nii")
       
         if (!dir.exists(save.dir)) { dir.create(save.dir) }
-      
         init.nii(file.name=fname, dims=img.dims[1:3], 
                  pixdim=unlist(nii.hdr(nii.p, "pixdim")),
                  orient=nii.orient(nii.p))
