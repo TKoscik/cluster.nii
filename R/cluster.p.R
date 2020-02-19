@@ -111,9 +111,9 @@ cluster.p <- function(nii.p, vol.p=1,
       } 
     } else {
       warning("No clusters matching criteria detected")
-    }
-    if (!save.nii) {
-      return(cluster.array)
     } 
+  }
+  if (!save.nii) {
+    return(cluster.array)
   }
 }
