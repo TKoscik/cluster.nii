@@ -84,8 +84,10 @@ cluster.p <- function(nii.p, vol.p=1,
     connected.size <- connected.size[which(connected.size$Freq >= cluster.size), ]
     n.clusters <- nrow(connected.size)
     if (n.clusters != 0) {
-      
       cluster.array <- array(0, dim=c(img.dims[1:3], n.clusters))
+      for (k in 1:n.clusters) {
+        cluster.array[connected == connected.size$connected[k]] <- k
+      }
       
       fname <- unlist(strsplit(nii.p, "[/]"))
       fname <- fname[(length(fname))]
@@ -109,16 +111,10 @@ cluster.p <- function(nii.p, vol.p=1,
       
       if (!dir.exists(save.dir)) { dir.create(save.dir) }
       
-      init.nii(file.name=fname, dims=c(img.dims[1:3], n.clusters),
+      init.nii(file.name=fname, dims=img.dims[1:3], 
                pixdim=unlist(nii.hdr(nii.p, "pixdim")),
                orient=nii.orient(nii.p))
-      
-      for (k in 1:n.clusters) {
-        write.nii.volume(
-          nii.file=fname,
-          vol.num=k,
-          values=array(as.numeric(connected==connected.size$connected[k]), dim=img.dims[1:3]))
-      }
+      write.nii.volume(nii.file=fname, vol.num=1, values=cluster.array)
     } else {
       warning("No clusters matching criteria detected")
     }
