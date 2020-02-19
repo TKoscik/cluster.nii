@@ -4,7 +4,7 @@ cluster.p <- function(nii.p, vol.p=1,
                       p.thresh=0.001,
                       cluster.size, 
                       connectivity=26,
-                      save.dir, file.name = NULL) {
+                      save.dir, file.name = NULL, save.nii=TRUE) {
   pmap <- read.nii.volume(nii.p, vol.p)
   
   if (!is.null(nii.mask)) {
@@ -89,32 +89,34 @@ cluster.p <- function(nii.p, vol.p=1,
         cluster.array[connected == connected.size$connected[k]] <- k
       }
       
-      fname <- unlist(strsplit(nii.p, "[/]"))
-      fname <- fname[(length(fname))]
-      fname <- unlist(strsplit(fname, "[.]"))
-      fname <- paste(fname[-length(fname)], collapse=".")
-      if (is.null(file.name)) {
-        fname <- paste0(save.dir, "/", fname,
-                        ".vol", vol.p,
-                        ".cl", connectivity,
-                        ".p", p.thresh,
-                        ".sz", cluster.size)
-      } else {
-        fname <- paste0(save.dir, "/",
-                        file.name)
-      }
-      if (j == 1) {
-        fname <- paste0(fname, ".pos.nii")
-      } else {
-        fname <- paste0(fname, ".neg.nii")
-      }
+      if (save.nii) {
+        fname <- unlist(strsplit(nii.p, "[/]"))
+        fname <- fname[(length(fname))]
+        fname <- unlist(strsplit(fname, "[.]"))
+        fname <- paste(fname[-length(fname)], collapse=".")
+        if (is.null(file.name)) {
+          fname <- paste0(save.dir, "/", fname,
+                          ".vol", vol.p,
+                          ".cl", connectivity,
+                          ".p", p.thresh,
+                          ".sz", cluster.size)
+        } else {
+          fname <- paste0(save.dir, "/", file.name)
+        }
+        if (j == 1) {
+          fname <- paste0(fname, ".pos.nii")
+        } else {
+          fname <- paste0(fname, ".neg.nii")
+        }
       
-      if (!dir.exists(save.dir)) { dir.create(save.dir) }
+        if (!dir.exists(save.dir)) { dir.create(save.dir) }
       
-      init.nii(file.name=fname, dims=img.dims[1:3], 
-               pixdim=unlist(nii.hdr(nii.p, "pixdim")),
-               orient=nii.orient(nii.p))
-      write.nii.volume(nii.file=fname, vol.num=1, values=cluster.array)
+        init.nii(file.name=fname, dims=img.dims[1:3], 
+                 pixdim=unlist(nii.hdr(nii.p, "pixdim")),
+                 orient=nii.orient(nii.p))
+        write.nii.volume(nii.file=fname, vol.num=1, values=cluster.array)
+      } else {
+        return(cluster.array)
     } else {
       warning("No clusters matching criteria detected")
     }
