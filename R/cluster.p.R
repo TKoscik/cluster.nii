@@ -110,9 +110,9 @@ cluster.p <- function(nii.p, vol.p=1,
         write.nii.volume(nii.file=fname, vol.num=1, values=cluster.array)
       } else {
         return(cluster.array)
-      } else {
-        warning("No clusters matching criteria detected")
-      }
+      } 
+    } else {
+      warning("No clusters matching criteria detected")
     }
   }
 }
