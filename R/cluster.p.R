@@ -97,12 +97,12 @@ cluster.p <- function(nii.p, vol.p=1,
         fname <- paste(fname[-length(fname)], collapse=".")
         if (is.null(file.name)) {
           fname <- paste0(save.dir, "/", fname,
-            ".vol", vol.p, ".cl", connectivity, ".p", p.thresh, ".sz", cluster.size)
+                          ".vol", vol.p, ".cl", connectivity, ".p", p.thresh, ".sz", cluster.size)
         } else {
           fname <- paste0(save.dir, "/", file.name)
         }
         fname <- paste0(fname, ".", names(cluster.array)[j], ".nii")
-      
+        
         if (!dir.exists(save.dir)) { dir.create(save.dir) }
         init.nii(file.name=fname, dims=img.dims[1:3], 
                  pixdim=unlist(nii.hdr(nii.p, "pixdim")),
@@ -110,8 +110,10 @@ cluster.p <- function(nii.p, vol.p=1,
         write.nii.volume(nii.file=fname, vol.num=1, values=cluster.array)
       } else {
         return(cluster.array)
-    } else {
-      warning("No clusters matching criteria detected")
+      } else {
+        warning("No clusters matching criteria detected")
+      }
     }
   }
 }
+
