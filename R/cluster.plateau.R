@@ -49,13 +49,13 @@ cluster.plateau <- function(nii.peak, vol.peak=1,
         }
       }
       
-      fname <- unlist(strsplit(nii.p, "[/]"))
+      fname <- unlist(strsplit(nii.peak, "[/]"))
       fname <- fname[(length(fname))]
       fname <- unlist(strsplit(fname, "[.]"))
       fname <- paste(fname[-length(fname)], collapse=".")
       if (is.null(file.name)) {
         fname <- paste0(save.dir, "/", fname,
-                        "_vol", vol.p,
+                        "_vol", vol.peak,
                         "_cl", connectivity,
                         "_ppeak", p.peak,
                         "_pplateau", p.plateau,
@@ -66,9 +66,9 @@ cluster.plateau <- function(nii.peak, vol.peak=1,
       fname <- paste0(fname, ".", names(peak)[j], ".nii")
       
       if (!dir.exists(save.dir)) { dir.create(save.dir) }
-      init.nii(file.name=fname, dims=nii.dims(nii.p)[1:3], 
-               pixdim=unlist(nii.hdr(nii.p, "pixdim")),
-               orient=nii.orient(nii.p))
+      init.nii(file.name=fname, dims=nii.dims(nii.peak)[1:3], 
+               pixdim=unlist(nii.hdr(nii.peak, "pixdim")),
+               orient=nii.orient(nii.peak))
       write.nii.volume(nii.file=fname, vol.num=1, values=cluster)
     }
   }
