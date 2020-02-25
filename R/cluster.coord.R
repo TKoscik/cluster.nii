@@ -1,98 +1,78 @@
 cluster.coord <- function(cluster.nii,
-                          cluster.vol = "all",
+                          cluster.value = "all",
                           value.nii = NULL,
-                          value.vol = NULL) {
-  #-------------------------------------------------------------------------------------
-  # Copyright (C) 2017 Koscik, Timothy R. All Rights Reserved
-  #-------------------------------------------------------------------------------------
-  #debug ----
-  # rm(list=ls())
-  # gc()
-  # cluster.nii <- "C:/Users/tim.koscik/Documents/Data/Duplex.Decision/analyses/20170602/clusters/GoodANDBadEV.clusters.nii"
-  # cluster.vol <- "all"
-  # value.nii <- "C:/Users/tim.koscik/Documents/Data/Duplex.Decision/analyses/20170602/models/Decision-fMRI.EVAll.zvalue.nii"
+                          value.vol = NULL,
+                          mm = TRUE) {
+
+  ### debug
+  # cluster.nii <- "/Shared/harshmanl/ckd_bids/derivatives/dwi/analyses/FA-boysOnly/dwi-FA_FA-boysOnly_coef-fdr_vol2_cl18_ppeak0.001_pplateau0.01_sz100.neg.nii"
+  # cluster.value = "all"
+  # value.nii <- "/Shared/harshmanl/ckd_bids/derivatives/dwi/analyses/FA-boysOnly/dwi-FA_FA-boysOnly_coef-tvalue.nii"
   # value.vol <- 2
-  # ----
-
-  # Check specified volumes ----
-  n.clusters <- 1:nii.dims(cluster.nii)[4]
-  if (!is.numeric(cluster.vol)) {
-    if (cluster.vol == "all") {
-      cluster.vol <- n.clusters
-    }
-  }
-  if (!all(cluster.vol %in% n.clusters)) {
-    stop("Specified cluster volumes are invalid")
-  }
-
-  # Get transform ----
-  tform <- nii.hdr(nii.file = cluster.nii,
-                   field = c("srow_x", "srow_y", "srow_z"))
-  tform <- rbind(tform$srow_x, tform$srow_y, tform$srow_z, c(0,0,0,1))
-
-
+  ###
+  
+  cluster <- read.nii.volume(cluster.nii, 1)
+  cluster.table <- as.data.frame(table(cluster))[-1, ]
+  colnames(cluster.table) <- c("Cluster Value", "Number of Voxels")
+  
   # Setup output container ----
-  coords <- list()
-  coords$n.voxels <- numeric(length(cluster.vol))
-  names(coords$n.voxels) <- paste0("Cluster", cluster.vol)
-
-  coords$cog <- data.frame(
-    world.x = numeric(length(cluster.vol)),
-    world.y = numeric(length(cluster.vol)),
-    world.z = numeric(length(cluster.vol)),
-    mni.x = numeric(length(cluster.vol)),
-    mni.y = numeric(length(cluster.vol)),
-    mni.z = numeric(length(cluster.vol)))
-  row.names(coords$cog) <- paste0("Cluster", cluster.vol)
-
-  if (!is.null(value.nii)) {
-    coords$peak <- data.frame(
-      world.x = numeric(length(cluster.vol)),
-      world.y = numeric(length(cluster.vol)),
-      world.z = numeric(length(cluster.vol)),
-      mni.x = numeric(length(cluster.vol)),
-      mni.y = numeric(length(cluster.vol)),
-      mni.z = numeric(length(cluster.vol)),
-      value = numeric(length(cluster.vol)))
-    row.names(coords$peak) <- paste0("Cluster", cluster.vol)
-  }
+  cluster.table$`Geometric Center X` <- numeric(nrow(cluster.table)) * NA
+  cluster.table$`Geometric Center Y` <- numeric(nrow(cluster.table)) * NA
+  cluster.table$`Geometric Center Z` <- numeric(nrow(cluster.table)) * NA
+  cluster.table$`Center of Gravity X` <- numeric(nrow(cluster.table)) * NA
+  cluster.table$`Center of Gravity Y` <- numeric(nrow(cluster.table)) * NA
+  cluster.table$`Center of Gravity Z` <- numeric(nrow(cluster.table)) * NA
+  cluster.table$`Peak X` <- numeric(nrow(cluster.table)) * NA
+  cluster.table$`Peak Y` <- numeric(nrow(cluster.table)) * NA
+  cluster.table$`Peak Z` <- numeric(nrow(cluster.table)) * NA
+  cluster.table$`Peak Value` <- numeric(nrow(cluster.table)) * NA
+  
   # Get World Coordinates ----
-  for (i in 1:length(cluster.vol)) {
-
-    cluster.mask <- read.nii.volume(cluster.nii, cluster.vol[i]) != 0
-    cluster.coords <- which(cluster.mask, arr.ind = TRUE)
-    cluster.values <- read.nii.volume(value.nii, value.vol)[cluster.mask]
-
-    coords$n.voxels[i] <- sum(cluster.mask)
-
-    coords$cog$world.x[i] <- round(weighted.mean(cluster.coords[ ,1], cluster.values))
-    coords$cog$world.y[i] <- round(weighted.mean(cluster.coords[ ,2], cluster.values))
-    coords$cog$world.z[i] <- round(weighted.mean(cluster.coords[ ,3], cluster.values))
-
+  if (!is.null(value.nii)) {
+    values <- read.nii.volume(value.nii, value.vol)
+  }
+  
+  for (i in 1:nrow(cluster.table)) {
+    cluster.coords <- which(cluster == cluster.table$`Cluster Value`[i], arr.ind = TRUE)
+    
+    cluster.table$`Geometric Center X`[i] <- mean(cluster.coords[ ,1])
+    cluster.table$`Geometric Center Y`[i] <- mean(cluster.coords[ ,2])
+    cluster.table$`Geometric Center Z`[i] <- mean(cluster.coords[ ,3])
+    
     if (!is.null(value.nii)) {
-      coords$peak$world.x[i] <- cluster.coords[which(abs(cluster.values) == max(abs(cluster.values)))[1],1]
-      coords$peak$world.y[i] <- cluster.coords[which(abs(cluster.values) == max(abs(cluster.values)))[1],2]
-      coords$peak$world.z[i] <- cluster.coords[which(abs(cluster.values) == max(abs(cluster.values)))[1],3]
+      cluster.values <- values[cluster.coords]
+      cluster.table$`Center of Gravity X`[i] <- weighted.mean(cluster.coords[ ,1], cluster.values)
+      cluster.table$`Center of Gravity Y`[i] <- weighted.mean(cluster.coords[ ,2], cluster.values)
+      cluster.table$`Center of Gravity Z`[i] <- weighted.mean(cluster.coords[ ,3], cluster.values)
       
-      cluster.values <- read.nii.volume(value.nii, value.vol)
-      coords$peak$value[i] <- cluster.values[coords$peak$world.x[i],
-                                             coords$peak$world.y[i],
-                                             coords$peak$world.z[i]]
+      cluster.table$`Peak X`[i] <- cluster.coords[which(abs(cluster.values) == max(abs(cluster.values)))[1],1]
+      cluster.table$`Peak Y`[i] <- cluster.coords[which(abs(cluster.values) == max(abs(cluster.values)))[1],2]
+      cluster.table$`Peak Z`[i] <- cluster.coords[which(abs(cluster.values) == max(abs(cluster.values)))[1],3]
+      cluster.table$`Peak Value`[i] <- cluster.values[which(abs(cluster.values) == max(abs(cluster.values)))[1]]
     }
   }
 
-  # Convert to MNI ----
-  coords$cog[ ,4:6] <- t(tform %*% rbind(coords$cog$world.x-1,
-                                         coords$cog$world.y-1,
-                                         coords$cog$world.z-1,
-                                         rep(1, length(cluster.vol))))[ ,-4]
-  if (!is.null(value.nii)) {
-    coords$peak[ ,4:6] <- t(tform %*% rbind(coords$peak$world.x-1,
-                                            coords$peak$world.y-1,
-                                            coords$peak$world.z-1,
-                                            rep(1, length(cluster.vol))))[ ,-4]
+  # Convert to MM ----
+  if (mm) {
+    # Get transform ----
+    tform <- nii.hdr(nii.file = cluster.nii,
+                     field = c("srow_x", "srow_y", "srow_z"))
+    tform <- rbind(tform$srow_x, tform$srow_y, tform$srow_z, c(0,0,0,1))
+    
+    cluster.table[ ,3:5] <- t(tform %*% rbind(cluster.table$`Geometric Center X`-1,
+                                              cluster.table$`Geometric Center Y`-1,
+                                              cluster.table$`Geometric Center Z`-1,
+                                              rep(1, nrow(cluster.table))))[ ,-4]
+    cluster.table[ ,6:8] <- t(tform %*% rbind(cluster.table$`Center of Gravity X`-1,
+                                              cluster.table$`Center of Gravity Y`-1,
+                                              cluster.table$`Center of Gravity Z`-1,
+                                              rep(1, nrow(cluster.table))))[ ,-4]
+    cluster.table[ ,7:9] <- t(tform %*% rbind(cluster.table$`Peak X`-1,
+                                              cluster.table$`Peak Y`-1,
+                                              cluster.table$`Peak Z`-1,
+                                              rep(1, nrow(cluster.table))))[ ,-4]
   }
 
   # Output ----
-  return(coords)
+  return(cluster.table)
 }
