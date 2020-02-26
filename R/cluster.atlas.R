@@ -1,4 +1,4 @@
-cluster.summary <- function(cluster.nii, atlas.nii, atlas.key) {
+cluster.atlas <- function(cluster.nii, atlas.nii, atlas.key) {
   
   # debug
   # cluster.nii <- "/Shared/harshmanl/ckd_bids/derivatives/dwi/analyses/FA-boysOnly/dwi-FA_FA-boysOnly_coef-fdr_vol2_cl18_ppeak0.001_pplateau0.01_sz100.neg.nii"
