@@ -67,7 +67,7 @@ cluster.coord <- function(cluster.nii,
                                               cluster.table$`Center of Gravity Y`-1,
                                               cluster.table$`Center of Gravity Z`-1,
                                               rep(1, nrow(cluster.table))))[ ,-4]
-    cluster.table[ ,7:9] <- t(tform %*% rbind(cluster.table$`Peak X`-1,
+    cluster.table[ ,9:11] <- t(tform %*% rbind(cluster.table$`Peak X`-1,
                                               cluster.table$`Peak Y`-1,
                                               cluster.table$`Peak Z`-1,
                                               rep(1, nrow(cluster.table))))[ ,-4]
