@@ -107,7 +107,7 @@ cluster.p <- function(nii.p, vol.p=1,
         init.nii(file.name=fname, dims=img.dims[1:3], 
                  pixdim=unlist(nii.hdr(nii.p, "pixdim")),
                  orient=nii.orient(nii.p))
-        write.nii.volume(nii.file=fname, vol.num=1, values=cluster.array)
+        write.nii.volume(nii.file=fname, vol.num=1, values=cluster.array[[j]])
       } 
     } else {
       warning("No clusters matching criteria detected")
